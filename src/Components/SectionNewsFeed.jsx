@@ -6,6 +6,7 @@ import PostAPI from '../APIs/PostAPI'
 import PostImageAPI from '../APIs/PostImageAPI'
 import Moment from "react-moment";
 import Loading from './Loading';
+import DeletePostAPI from '../APIs/DeletePostAPI'
 
 class NewsFeed extends Component {
     state = {
@@ -17,7 +18,8 @@ class NewsFeed extends Component {
         createPostText: undefined,
         createPostImage: undefined,
         createPostError: false,
-        createIsLoading: false
+        editPostText: undefined,
+        editPostId: undefined
     }
 
     render() {
@@ -39,10 +41,6 @@ class NewsFeed extends Component {
                                             </a>
                                             <Modal toggle={() => this.setState({ createOpen: !this.state.createOpen })} isOpen={this.state.createOpen} >
                                                 <ModalHeader toggle={() => this.setState({ createOpen: !this.state.createOpen })} style={{ backgroundColor: '#0073b1', color: 'white' }}>Create Post</ModalHeader>
-                                                {this.state.createIsLoading
-                                                ?
-                                                <Loading/>
-                                                :
                                                 <ModalBody>
                                                     {this.state.personalProfile
                                                         ?
@@ -59,13 +57,36 @@ class NewsFeed extends Component {
                                                             <Input onChange={(val) => this.setState({ createPostImage: val.target.files[0] })} type="file" />
                                                         </>
                                                     }
-                                                </ModalBody>}
+                                                </ModalBody>
                                                 <ModalFooter>
                                                     <Button onClick={() => this.publishPost()} color="primary" >Publish</Button>
                                                 </ModalFooter>
                                             </Modal>
                                         </Col>
                                     </Row>
+                                    <Modal toggle={() => this.setState({ editOpen: !this.state.editOpen })} isOpen={this.state.editOpen} >
+                                        <ModalHeader toggle={() => this.setState({ editOpen: !this.state.editOpen })} style={{ backgroundColor: '#0073b1', color: 'white' }}>Edit Post</ModalHeader>
+                                        <ModalBody>
+                                            {this.state.personalProfile
+                                                ?
+                                                < img className='newsfeed-pic' src={this.state.personalProfile.image} alt='profile pic' />
+                                                :
+                                                <img className='newsfeed-pic' src='src="https://www.shareicon.net/data/512x512/2015/10/02/649910_user_512x512.png"' alt='profile pic' />
+                                            }
+                                            {this.state.personalProfile &&
+                                                <>
+                                                    <span style={{ color: 'black', padding: '10px', fontWeight: '600' }}>{this.state.personalProfile.name}{" "}{this.state.personalProfile.surname}</span>
+                                                    <Input onChange={(val) => this.setState({
+                                                        editPostText: val.target.value
+                                                    })} type="textarea" value={this.state.editPostText} style={{ borderColor: 'white' }} />
+                                                    {/*  <Input onChange={(val) => this.setState({ createPostImage: val.target.files[0] })} type="file" /> */}
+                                                </>
+                                            }
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            <Button onClick={() => this.editPost()} color="primary" >Edit</Button>
+                                        </ModalFooter>
+                                    </Modal>
                                     {this.state.posts.slice(0, 30)
                                         .map((post, index) =>
                                             <Row key={index} className="news-feed">
@@ -82,7 +103,14 @@ class NewsFeed extends Component {
                                                         </Row>
                                                     </Link>
                                                     {post._edit &&
-                                                        <i className="fa fa-pencil"></i>}
+                                                    <>
+                                                        <i onClick={() => this.setState({
+                                                            editOpen: true,
+                                                            editPostText: post.text,
+                                                            editPostId: post._id
+                                                        })} className="fa fa-pencil"></i>
+                                                        <i onClick={() => this.removePost(post._id)} class="far fa-trash-alt"></i>
+                                                    </>}
                                                     <Row>
                                                         <p style={{ paddingTop: '20px' }}>{post.text}</p>
                                                     </Row>
@@ -134,9 +162,20 @@ class NewsFeed extends Component {
         })
     }
 
+    removePost = async (id) => {
+        await DeletePostAPI(localStorage.getItem('username'), localStorage.getItem('password'), id)
+    }
+
+    /* editPost = async () => {
+        this.
+    } */
+
     publishPost = async () => {
-        this.setState({createIsLoading: true})
         if (this.state.createPostText) {
+            this.setState({
+                createOpen: false,
+                createPostError: false
+            })
             let postObject = {
                 text: this.state.createPostText
             }
@@ -148,7 +187,6 @@ class NewsFeed extends Component {
                 createOpen: false,
                 createPostError: false
             })
-            this.setState({createIsLoading: false})
         } else {
             this.setState({ createPostError: true })
         }

@@ -1,6 +1,6 @@
 
-const DeleteEachExperienceByID = async (ID,userName,password) => {
-    let URL = "https://strive-school-testing-apis.herokuapp.com/api/profile/"+ userName + "/experiences/".concat(ID) 
+const DeletePostAPI = async (userName,password, postID) => {
+    let URL = "https://strive-school-testing-apis.herokuapp.com/api/posts/".concat(postID) 
     try {
         let response = await fetch(URL, {
             method: "DELETE",
@@ -17,4 +17,4 @@ const DeleteEachExperienceByID = async (ID,userName,password) => {
     }
 }
 
-export default DeleteEachExperienceByID
+export default DeletePostAPI

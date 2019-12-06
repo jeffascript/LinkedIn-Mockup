@@ -6,6 +6,7 @@ const PutAPI = async (userName,password, whatToUpdate, theUpdate, theID) => {
         break
         case 'profile':
             URL = "https://strive-school-testing-apis.herokuapp.com/api/profile/"
+        break
     }
     try {
         let response = await fetch(URL, {

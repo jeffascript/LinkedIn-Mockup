@@ -128,13 +128,6 @@ class EditExperience extends Component {
               </Button>
               <Button color="success">Update</Button>
             </Form>
-
-
-
-           
-
-
-
           </ModalBody>
 
           {/* <ModalFooter>

@@ -169,11 +169,7 @@ i:hover {
   background-color: white;
 }
 
-.fa-plus {
-  float: right;
-}
-
-.fa-pencil {
+.fa-pencil, .fa-trash-alt, .fa-plus {
   float: right;
 }
 
