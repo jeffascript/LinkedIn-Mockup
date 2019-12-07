@@ -30,6 +30,11 @@ class NewsFeed extends Component {
                     <Loading />
                     :
                     <Fade >
+                        <div className="feed-profile">
+                            <img className="profile-pic mt-0 mb-2" src={this.state.personalProfile.image} alt="no image" />
+                            <h4>{this.state.personalProfile.name + " " + this.state.personalProfile.surname}</h4>
+                            <h6>{this.state.personalProfile.title}</h6>
+                        </div>
                         <Container style={{ maxWidth: '700px' }}>
                             <Row>
                                 <Col className="mx-auto">
@@ -103,14 +108,15 @@ class NewsFeed extends Component {
                                                         </Row>
                                                     </Link>
                                                     {post._edit &&
-                                                    <>
-                                                        <i onClick={() => this.setState({
-                                                            editOpen: true,
-                                                            editPostText: post.text,
-                                                            editPostId: post._id
-                                                        })} className="fa fa-pencil"></i>
-                                                        <i onClick={() => this.removePost(post._id)} class="far fa-trash-alt"></i>
-                                                    </>}
+                                                        <>
+                                                            <i onClick={() =>
+                                                                this.setState({
+                                                                    editOpen: true,
+                                                                    editPostText: post.text,
+                                                                    editPostId: post._id
+                                                                })} className="fa fa-pencil"></i>
+                                                            <i onClick={() => this.removePost(post._id)} class="far fa-trash-alt"></i>
+                                                        </>}
                                                     <Row>
                                                         <p style={{ paddingTop: '20px' }}>{post.text}</p>
                                                     </Row>
@@ -164,7 +170,10 @@ class NewsFeed extends Component {
 
     removePost = async (id) => {
         await DeletePostAPI(localStorage.getItem('username'), localStorage.getItem('password'), id)
+        console.log("hi")
+        await this.forceUpdate()
     }
+
 
     /* editPost = async () => {
         this.
