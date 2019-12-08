@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import GetAPI from '../APIs/GetAPI';
-import { Alert, Container, Col, Fade, Row, Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from 'reactstrap'
+import { Label, Alert, Container, Col, Fade, Row, Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from 'reactstrap'
 import { Link } from 'react-router-dom'
 import PostAPI from '../APIs/PostAPI'
 import PostImageAPI from '../APIs/PostImageAPI'
@@ -63,7 +63,14 @@ class NewsFeed extends Component {
                                                             <Input onChange={(val) => this.setState({
                                                                 createPostText: val.target.value
                                                             })} type="textarea" placeholder='What would you like to talk about?' style={{ borderColor: 'white' }} />
-                                                            <Input onChange={(val) => this.setState({ createPostImage: val.target.files[0] })} type="file" />
+                                                            <Label className="btn btn-secondary">
+                                                                <Input onChange={(val) => this.setState({ createPostImage: val.target.files[0] })} type="file" />
+                                                                Select Image
+                                                            </Label>
+                                                            {this.state.createPostImage &&
+                                                                <Label>
+                                                                    {this.state.createPostImage.name}
+                                                                </Label>}
                                                         </>
                                                     }
                                                 </ModalBody>

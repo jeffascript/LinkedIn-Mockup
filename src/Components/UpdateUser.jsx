@@ -60,7 +60,7 @@ class UpdateUser extends Component {
             <hr/>
             <Form onSubmit={this.uploadImage}>
               <FormGroup>
-                <Label className="btn btn-primary">
+                <Label className="btn btn-secondary">
                   <Input onChange={(val) => this.setState({ selectedFile: val.target.files[0] })} type="file" />
                   Select Image
                 </Label>
