@@ -218,6 +218,7 @@ i:hover {
   border: 1px solid #dadada;
   padding: 30px;
   margin-top: 20px;
+  margin-bottom: 20px;
   padding-bottom: 10px !important;
   border-radius: 5px;
   max-width: 700px !important;
@@ -280,5 +281,24 @@ a:hover {
   text-align: center;
   border-radius: 7px;
   border: 1px solid #dddddd;
+  background-color: white;
+}
+
+input[type="file"] {
+  display: none !important;
+}
+
+.close span {
+  color:#505050
+}
+
+.profile-body span, .profile-body i.fa-building-o {
+  color: black !important;
+  margin-left: -4px;
+}
+
+.profile-body span:hover, .profile-body i.fa-building-o:hover {
+  color: black !important;
+  cursor: default;
   background-color: white;
 }

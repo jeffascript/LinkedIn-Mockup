@@ -35,7 +35,7 @@ class NavBar extends Component {
                         <Collapse style={{ backgroundColor: 'white', borderRadius: '5px', marginTop: '5px', marginLeft: '20px', position: 'absolute', border: '1px solid #ddd'}} isOpen={this.state.isOpen}>
                             {this.state.allUsersFilter
                                 .map((user, index) =>
-                                    <Link onClick={() => this.setState({isOpen: false, search: ""})} key={index} to={"/profile/" + user.username}>
+                                    <Link onClick={() => this.setState({isOpen: false, search: undefined})} key={index} to={"/profile/" + user.username}>
                                         <Row className="mx-auto search-item">
                                             <img className="nav-icon nav-icon-userimg" src={user.image ? user.image : 'https://www.shareicon.net/data/512x512/2015/10/02/649910_user_512x512.png'} alt="profile-img" />
                                             <h5 style={{ marginLeft: '10px', color: 'black' }}>{user.name + " " + user.surname}</h5>

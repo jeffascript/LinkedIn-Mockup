@@ -35,7 +35,7 @@ class CreateExperience extends Component {
     return (
       <div>
         <Modal isOpen={this.state.isOpen} toggle={this.toggleClose}>
-          <ModalHeader toggle={this.toggleClose}>Modal title</ModalHeader>
+          <ModalHeader toggle={this.toggleClose}>Add Experience</ModalHeader>
           <ModalBody>
             <Form onSubmit={this.postNewDetails}>
               <FormGroup>
@@ -43,7 +43,6 @@ class CreateExperience extends Component {
                 <Input
                   type="text"
                   id="role"
-                  placeholder="Role"
                 />
               </FormGroup>
               <FormGroup>
@@ -51,7 +50,6 @@ class CreateExperience extends Component {
                 <Input
                   type="text"
                   id="company"
-                  placeholder="Add Company details"
                 />
               </FormGroup>
               <FormGroup>
@@ -59,7 +57,6 @@ class CreateExperience extends Component {
                 <Input
                   type="text"
                   id="description"
-                  placeholder="Add Description"
                 />
               </FormGroup>
               <FormGroup>
@@ -76,7 +73,6 @@ class CreateExperience extends Component {
                   type="date"
                   name="date"
                   id="startDate"
-                  placeholder="Start Date"
                 />
               </FormGroup>
               <FormGroup>
@@ -85,7 +81,6 @@ class CreateExperience extends Component {
                   type="date"
                   name="date"
                   id="endDate"
-                  placeholder="End Date"
                 />
               </FormGroup>
               <FormGroup >
@@ -137,7 +132,7 @@ class CreateExperience extends Component {
 
     let fdataExp = new FormData();
     fdataExp.append("experience", this.state.selectedFile)
-    let newfileUploaded = await PostImageExperience (localStorage.getItem('username'), localStorage.getItem('password'), newPostResponse._id, fdataExp)
+    await PostImageExperience (localStorage.getItem('username'), localStorage.getItem('password'), newPostResponse._id, fdataExp)
 
     this.props.closeModal()
   }

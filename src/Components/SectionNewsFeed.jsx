@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import GetAPI from '../APIs/GetAPI';
-import { Container, Col, Fade, Row, Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from 'reactstrap'
+import { Alert, Container, Col, Fade, Row, Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from 'reactstrap'
 import { Link } from 'react-router-dom'
 import PostAPI from '../APIs/PostAPI'
 import PostImageAPI from '../APIs/PostImageAPI'
@@ -11,6 +11,7 @@ import DeletePostAPI from '../APIs/DeletePostAPI'
 class NewsFeed extends Component {
     state = {
         posts: [],
+        numberPosts: 20,
         isLoading: true,
         createOpen: false,
         editOpen: false,
@@ -56,6 +57,9 @@ class NewsFeed extends Component {
                                                     {this.state.personalProfile &&
                                                         <>
                                                             <span style={{ color: 'black', padding: '10px', fontWeight: '600' }}>{this.state.personalProfile.name}{" "}{this.state.personalProfile.surname}</span>
+                                                            {this.state.createPostError &&
+                                                                <Alert className="m-2" color="danger">Add a description</Alert>
+                                                            }
                                                             <Input onChange={(val) => this.setState({
                                                                 createPostText: val.target.value
                                                             })} type="textarea" placeholder='What would you like to talk about?' style={{ borderColor: 'white' }} />
@@ -92,7 +96,7 @@ class NewsFeed extends Component {
                                             <Button onClick={() => this.editPost()} color="primary" >Edit</Button>
                                         </ModalFooter>
                                     </Modal>
-                                    {this.state.posts.slice(0, 30)
+                                    {this.state.posts.slice(0, this.state.numberPosts)
                                         .map((post, index) =>
                                             <Row key={index} className="news-feed">
                                                 <Col>
@@ -130,10 +134,16 @@ class NewsFeed extends Component {
                                                 </Col>
                                             </Row>)
                                     }
+                                    <Row>
+                                        <Col style={{ textAlign: 'center' }}>
+                                            <Button onClick={() => this.setState({ numberPosts: this.state.numberPosts + 20 })} color="primary">LOAD MORE</Button>
+                                        </Col>
+                                    </Row>
                                 </Col>
                             </Row>
                         </Container>
                     </Fade>
+
                 }
             </>
         );
@@ -170,14 +180,8 @@ class NewsFeed extends Component {
 
     removePost = async (id) => {
         await DeletePostAPI(localStorage.getItem('username'), localStorage.getItem('password'), id)
-        console.log("hi")
-        await this.forceUpdate()
+        this.setState({ posts: this.state.posts.filter(post => post._id !== id) })
     }
-
-
-    /* editPost = async () => {
-        this.
-    } */
 
     publishPost = async () => {
         if (this.state.createPostText) {
@@ -189,12 +193,26 @@ class NewsFeed extends Component {
                 text: this.state.createPostText
             }
             let response = await PostAPI(localStorage.getItem('username'), localStorage.getItem('password'), 'post', postObject)
-            let fd = new FormData();
-            fd.append("post", this.state.createPostImage)
-            await PostImageAPI(localStorage.getItem('username'), localStorage.getItem('password'), fd, 'post', response._id)
+            if (this.state.createPostImage) {
+                let fd = new FormData();
+                fd.append("post", this.state.createPostImage)
+                await PostImageAPI(localStorage.getItem('username'), localStorage.getItem('password'), fd, 'post', response._id)
+            }
+            let post = await GetAPI(localStorage.getItem('username'), localStorage.getItem('password'), 'post', '', response._id)
+            post.name = this.state.personalProfile.name
+            post.surname = this.state.personalProfile.surname
+            post._edit = true
+            this.state.personalProfile.image
+                ?
+                post.userImage = this.state.personalProfile.image
+                :
+                post.userImage = "https://www.shareicon.net/data/512x512/2015/10/02/649910_user_512x512.png"
+            this.state.posts.unshift(post)
             this.setState({
                 createOpen: false,
-                createPostError: false
+                createPostError: false,
+                createPostImage: undefined,
+                createPostText: undefined
             })
         } else {
             this.setState({ createPostError: true })
