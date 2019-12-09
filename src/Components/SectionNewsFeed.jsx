@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import GetAPI from '../APIs/GetAPI';
-import { Container, Col, Fade, Row, Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from 'reactstrap'
+import { Label, Alert, Container, Col, Fade, Row, Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from 'reactstrap'
 import { Link } from 'react-router-dom'
 import PostAPI from '../APIs/PostAPI'
 import PostImageAPI from '../APIs/PostImageAPI'
 import Moment from "react-moment";
 import Loading from './Loading';
+import DeletePostAPI from '../APIs/DeletePostAPI'
 
 class NewsFeed extends Component {
     state = {
         posts: [],
+        numberPosts: 20,
         isLoading: true,
         createOpen: false,
         editOpen: false,
@@ -17,7 +19,8 @@ class NewsFeed extends Component {
         createPostText: undefined,
         createPostImage: undefined,
         createPostError: false,
-        createIsLoading: false
+        editPostText: undefined,
+        editPostId: undefined
     }
 
     render() {
@@ -28,6 +31,11 @@ class NewsFeed extends Component {
                     <Loading />
                     :
                     <Fade >
+                        <div className="feed-profile">
+                            <img className="profile-pic mt-0 mb-2" src={this.state.personalProfile.image} alt="no image" />
+                            <h4>{this.state.personalProfile.name + " " + this.state.personalProfile.surname}</h4>
+                            <h6>{this.state.personalProfile.title}</h6>
+                        </div>
                         <Container style={{ maxWidth: '700px' }}>
                             <Row>
                                 <Col className="mx-auto">
@@ -39,10 +47,6 @@ class NewsFeed extends Component {
                                             </a>
                                             <Modal toggle={() => this.setState({ createOpen: !this.state.createOpen })} isOpen={this.state.createOpen} >
                                                 <ModalHeader toggle={() => this.setState({ createOpen: !this.state.createOpen })} style={{ backgroundColor: '#0073b1', color: 'white' }}>Create Post</ModalHeader>
-                                                {this.state.createIsLoading
-                                                ?
-                                                <Loading/>
-                                                :
                                                 <ModalBody>
                                                     {this.state.personalProfile
                                                         ?
@@ -53,20 +57,53 @@ class NewsFeed extends Component {
                                                     {this.state.personalProfile &&
                                                         <>
                                                             <span style={{ color: 'black', padding: '10px', fontWeight: '600' }}>{this.state.personalProfile.name}{" "}{this.state.personalProfile.surname}</span>
+                                                            {this.state.createPostError &&
+                                                                <Alert className="m-2" color="danger">Add a description</Alert>
+                                                            }
                                                             <Input onChange={(val) => this.setState({
                                                                 createPostText: val.target.value
                                                             })} type="textarea" placeholder='What would you like to talk about?' style={{ borderColor: 'white' }} />
-                                                            <Input onChange={(val) => this.setState({ createPostImage: val.target.files[0] })} type="file" />
+                                                            <Label className="btn btn-secondary">
+                                                                <Input onChange={(val) => this.setState({ createPostImage: val.target.files[0] })} type="file" />
+                                                                Select Image
+                                                            </Label>
+                                                            {this.state.createPostImage &&
+                                                                <Label>
+                                                                    {this.state.createPostImage.name}
+                                                                </Label>}
                                                         </>
                                                     }
-                                                </ModalBody>}
+                                                </ModalBody>
                                                 <ModalFooter>
                                                     <Button onClick={() => this.publishPost()} color="primary" >Publish</Button>
                                                 </ModalFooter>
                                             </Modal>
                                         </Col>
                                     </Row>
-                                    {this.state.posts.slice(0, 30)
+                                    <Modal toggle={() => this.setState({ editOpen: !this.state.editOpen })} isOpen={this.state.editOpen} >
+                                        <ModalHeader toggle={() => this.setState({ editOpen: !this.state.editOpen })} style={{ backgroundColor: '#0073b1', color: 'white' }}>Edit Post</ModalHeader>
+                                        <ModalBody>
+                                            {this.state.personalProfile
+                                                ?
+                                                < img className='newsfeed-pic' src={this.state.personalProfile.image} alt='profile pic' />
+                                                :
+                                                <img className='newsfeed-pic' src='src="https://www.shareicon.net/data/512x512/2015/10/02/649910_user_512x512.png"' alt='profile pic' />
+                                            }
+                                            {this.state.personalProfile &&
+                                                <>
+                                                    <span style={{ color: 'black', padding: '10px', fontWeight: '600' }}>{this.state.personalProfile.name}{" "}{this.state.personalProfile.surname}</span>
+                                                    <Input onChange={(val) => this.setState({
+                                                        editPostText: val.target.value
+                                                    })} type="textarea" value={this.state.editPostText} style={{ borderColor: 'white' }} />
+                                                    {/*  <Input onChange={(val) => this.setState({ createPostImage: val.target.files[0] })} type="file" /> */}
+                                                </>
+                                            }
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            <Button onClick={() => this.editPost()} color="primary" >Edit</Button>
+                                        </ModalFooter>
+                                    </Modal>
+                                    {this.state.posts.slice(0, this.state.numberPosts)
                                         .map((post, index) =>
                                             <Row key={index} className="news-feed">
                                                 <Col>
@@ -82,7 +119,15 @@ class NewsFeed extends Component {
                                                         </Row>
                                                     </Link>
                                                     {post._edit &&
-                                                        <i className="fa fa-pencil"></i>}
+                                                        <>
+                                                            <i onClick={() =>
+                                                                this.setState({
+                                                                    editOpen: true,
+                                                                    editPostText: post.text,
+                                                                    editPostId: post._id
+                                                                })} className="fa fa-pencil"></i>
+                                                            <i onClick={() => this.removePost(post._id)} class="far fa-trash-alt"></i>
+                                                        </>}
                                                     <Row>
                                                         <p style={{ paddingTop: '20px' }}>{post.text}</p>
                                                     </Row>
@@ -96,10 +141,16 @@ class NewsFeed extends Component {
                                                 </Col>
                                             </Row>)
                                     }
+                                    <Row>
+                                        <Col style={{ textAlign: 'center' }}>
+                                            <Button onClick={() => this.setState({ numberPosts: this.state.numberPosts + 20 })} color="primary">LOAD MORE</Button>
+                                        </Col>
+                                    </Row>
                                 </Col>
                             </Row>
                         </Container>
                     </Fade>
+
                 }
             </>
         );
@@ -134,21 +185,42 @@ class NewsFeed extends Component {
         })
     }
 
+    removePost = async (id) => {
+        await DeletePostAPI(localStorage.getItem('username'), localStorage.getItem('password'), id)
+        this.setState({ posts: this.state.posts.filter(post => post._id !== id) })
+    }
+
     publishPost = async () => {
-        this.setState({createIsLoading: true})
         if (this.state.createPostText) {
-            let postObject = {
-                text: this.state.createPostText
-            }
-            let response = await PostAPI(localStorage.getItem('username'), localStorage.getItem('password'), 'post', postObject)
-            let fd = new FormData();
-            fd.append("post", this.state.createPostImage)
-            await PostImageAPI(localStorage.getItem('username'), localStorage.getItem('password'), fd, 'post', response._id)
             this.setState({
                 createOpen: false,
                 createPostError: false
             })
-            this.setState({createIsLoading: false})
+            let postObject = {
+                text: this.state.createPostText
+            }
+            let response = await PostAPI(localStorage.getItem('username'), localStorage.getItem('password'), 'post', postObject)
+            if (this.state.createPostImage) {
+                let fd = new FormData();
+                fd.append("post", this.state.createPostImage)
+                await PostImageAPI(localStorage.getItem('username'), localStorage.getItem('password'), fd, 'post', response._id)
+            }
+            let post = await GetAPI(localStorage.getItem('username'), localStorage.getItem('password'), 'post', '', response._id)
+            post.name = this.state.personalProfile.name
+            post.surname = this.state.personalProfile.surname
+            post._edit = true
+            this.state.personalProfile.image
+                ?
+                post.userImage = this.state.personalProfile.image
+                :
+                post.userImage = "https://www.shareicon.net/data/512x512/2015/10/02/649910_user_512x512.png"
+            this.state.posts.unshift(post)
+            this.setState({
+                createOpen: false,
+                createPostError: false,
+                createPostImage: undefined,
+                createPostText: undefined
+            })
         } else {
             this.setState({ createPostError: true })
         }

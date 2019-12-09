@@ -6,7 +6,7 @@ import {
   Button,
   Form,
   FormGroup,
-  Label, 
+  Label,
   Input, ModalFooter
 } from "reactstrap";
 import PutAPI from "../APIs/PutAPI";
@@ -108,16 +108,16 @@ class EditExperience extends Component {
                 />
               </FormGroup>
               <FormGroup >
-                
-                <Input onChange={(val) => this.setState({selectedFile: val.target.files[0]})}  type="file"  name= "file" />
-                
+
+                <Input onChange={(val) => this.setState({ selectedFile: val.target.files[0] })} type="file" name="file" />
+
               </FormGroup>
               <Button
                 color="danger"
                 onClick={async () => {
-                  await DeleteEachExperienceByID( 
+                  await DeleteEachExperienceByID(
                     this.props.id,
-                    localStorage.getItem('username'), 
+                    localStorage.getItem('username'),
                     localStorage.getItem('password')
                   );
                   this.props.closeModal();
@@ -128,13 +128,6 @@ class EditExperience extends Component {
               </Button>
               <Button color="success">Update</Button>
             </Form>
-
-
-
-           
-
-
-
           </ModalBody>
 
           {/* <ModalFooter>
@@ -172,7 +165,7 @@ class EditExperience extends Component {
 
   componentDidMount = async () => {
     let oneUserExperienceProfile = await GetAPI(
-      localStorage.getItem('username'), 
+      localStorage.getItem('username'),
       localStorage.getItem('password'),
       'experience',
       '',
@@ -189,11 +182,12 @@ class EditExperience extends Component {
     });
 
 
-    console.log("ID here", this.props.id )
+    console.log("ID here", this.props.id)
   };
 
   postUpdatedDetails = async e => {
     e.preventDefault();
+    this.props.closeModal();
     let editedProfileObject = {
       role: this.state.role,
       company: this.state.company,
@@ -202,23 +196,18 @@ class EditExperience extends Component {
       startDate: this.state.startDate,
       endDate: this.state.startDate
     };
-
-    await PutAPI( 
-      localStorage.getItem('username'), 
+    await PutAPI(
+      localStorage.getItem('username'),
       localStorage.getItem('password'),
       'experience',
       editedProfileObject,
       this.props.id
     );
-
-    
     if(this.state.selectedFile) {
       let fdExp = new FormData();
-    fdExp.append("experience", this.state.selectedFile)
-      await PostImageExperience (localStorage.getItem('username'), localStorage.getItem('password'), this.props.experience._id, fdExp)
+      fdExp.append("experience", this.state.selectedFile)
+      await PostImageExperience(localStorage.getItem('username'), localStorage.getItem('password'), this.props.id, fdExp)
     }
-
-    this.props.closeModal();
   };
 }
 

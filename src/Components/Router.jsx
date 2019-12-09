@@ -25,10 +25,11 @@ class MainComponent extends Component {
               {this.state.isLoading && <PageLoading />}
               {!this.state.isLoading &&
                 <>
+                  <></>
                   <Fade>
                     <NavBar logout={this.logout} />
                     <Route path="/" exact component={PageHome} />
-                    <Route path="/profile/:user" component={PageProfile} />
+                    <Route path="/profile/:user" component={PageProfile}/>
                   </Fade>
                 </>}
             </Switch>
@@ -84,6 +85,7 @@ class MainComponent extends Component {
     localStorage.setItem('username', username)
     localStorage.setItem('password', password)
     response ? this.setState({ logged: true }) : this.setState({ wrongPass: true })
+
   }
 
   logout = () => {
