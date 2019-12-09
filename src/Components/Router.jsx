@@ -29,7 +29,7 @@ class MainComponent extends Component {
                   <Fade>
                     <NavBar logout={this.logout} />
                     <Route path="/" exact component={PageHome} />
-                    <Route path="/profile/:user" component={PageProfile} />
+                    <Route path="/profile/:user" component={PageProfile}/>
                   </Fade>
                 </>}
             </Switch>
